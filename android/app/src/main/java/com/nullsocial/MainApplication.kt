@@ -1,4 +1,4 @@
-package com.null
+package com.nullsocial
 
 import android.app.Application
 import com.facebook.react.PackageList
