@@ -6,10 +6,6 @@ import { SafeScreen } from '@/components/templates';
 
 function Example() {
 
-
-
-
-
   return (
     <SafeScreen>
       <ScrollView>

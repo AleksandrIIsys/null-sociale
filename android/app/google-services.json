@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1079166157193",
+    "project_id": "null-a826d",
+    "storage_bucket": "null-a826d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1079166157193:android:8ed9e1c79ff9da47a42158",
+        "android_client_info": {
+          "package_name": "com.nullsocial"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD9fLbLxwkE8R_-0jr_vJH-Xp2DuJ8GVYc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

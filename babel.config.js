@@ -10,6 +10,7 @@ module.exports = {
         root: ['./src'],
       },
     ],
+    'react-native-paper/babel',
     'inline-dotenv',
   ],
   presets: ['module:@react-native/babel-preset'],
