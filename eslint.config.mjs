@@ -19,6 +19,12 @@ export default tseslint.config(
   tseslint.configs.strictTypeChecked,
   tseslint.configs.stylisticTypeChecked,
   unicorn.configs.all,
+  {
+    rules: {
+      'unicorn/no-null': OFF,
+      'unicorn/prefer-spread': OFF,
+    },
+  },
   perfectionist.configs['recommended-alphabetical'],
   importPlugin.flatConfigs.react,
   importPlugin.flatConfigs['react-native'],
@@ -31,7 +37,7 @@ export default tseslint.config(
   {
     languageOptions: {
       globals: {
-        __DEV__: 'readonly', // Définit __DEV__ comme une variable globale en lecture seule
+        __DEV__: 'readonly',
       },
       parserOptions: {
         projectService: true,
@@ -62,6 +68,11 @@ export default tseslint.config(
       '@typescript-eslint/consistent-type-definitions': [ERROR, 'type'],
       '@typescript-eslint/dot-notation': [ERROR, { allowKeywords: true }],
       '@typescript-eslint/no-empty-function': OFF,
+      "@typescript-eslint/no-misused-promises": [2, {
+        "checksVoidReturn": {
+          "attributes": false
+        }
+      }],
       '@typescript-eslint/restrict-template-expressions': OFF,
       'import/no-unresolved': OFF, // handled by TypeScript
       'no-console': [ERROR, { allow: ['warn', 'error'] }],
@@ -70,7 +81,7 @@ export default tseslint.config(
         { ignore: [-1, 0, 1, 2, 3, 4, 5, 6], ignoreArrayIndexes: true },
       ],
       'perfectionist/sort-imports': [
-        'error',
+        OFF, //TODO
         {
           customGroups: {
             value: {

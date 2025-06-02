@@ -1,8 +1,8 @@
-module.exports = {
+export default {
   arrowParens: 'avoid',
   bracketSameLine: true,
   bracketSpacing: true,
-  singleQuote: true,
   semi: true,
+  singleQuote: true,
   trailingComma: 'all',
 };

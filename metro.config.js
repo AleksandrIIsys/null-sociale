@@ -1,4 +1,8 @@
-const {getDefaultConfig, mergeConfig} = require('@react-native/metro-config');
+const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
+
+const defaultConfig = getDefaultConfig(__dirname);
+// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+const { assetExts, sourceExts } = defaultConfig.resolver;
 
 /**
  * Metro configuration
@@ -6,6 +10,16 @@ const {getDefaultConfig, mergeConfig} = require('@react-native/metro-config');
  *
  * @type {import('@react-native/metro-config').MetroConfig}
  */
-const config = {};
+const config = {
+  resolver: {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    assetExts: assetExts.filter((extension) => extension !== 'svg'),
+    sourceExts: [...sourceExts, 'svg'],
+  },
+  transformer: {
+    babelTransformerPath: require.resolve('react-native-svg-transformer'),
+    unstable_allowRequireContext: true,
+  },
+};
 
-module.exports = mergeConfig(getDefaultConfig(__dirname), config);
+module.exports = mergeConfig(defaultConfig, config);

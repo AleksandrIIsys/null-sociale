@@ -17,7 +17,7 @@ function App(): React.JSX.Element {
     <GestureHandlerRootView>
       <Provider store={store}>
           <PersistGate persistor={persistor}>
-            <PaperProvider>
+            <PaperProvider theme={{dark: false}}>
               <ThemeProvider>
                 <ApplicationNavigator />
               </ThemeProvider>

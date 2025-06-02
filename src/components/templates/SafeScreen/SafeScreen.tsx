@@ -14,18 +14,18 @@ type Properties = PropsWithChildren<
 >;
 
 function SafeScreen({
-  children = undefined,
-  isError = false,
-  onResetError = undefined,
-  style,
+  // children = undefined,
+  // isError = false,
+  // onResetError = undefined,
+  // style,
   ...props
 }: Properties) {
 
   return (
     <SafeAreaView {...props} mode="padding" style={[]}>
       <StatusBar
-        backgroundColor={"#000"}
-        barStyle={'light-content'}
+        backgroundColor="#000"
+        barStyle="light-content"
       />
       <Text>SafeScreen</Text>
     </SafeAreaView>

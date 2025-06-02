@@ -1,21 +1,35 @@
-import { Paths } from "@/navigation/paths";
-import { RootScreenProps } from "@/navigation/types";
-import { useEffect } from "react";
-import { Text, View } from "react-native";
+import { Paths } from '@/navigation/paths';
+import { RootScreenProps } from '@/navigation/types';
+import { useEffect } from 'react';
+import { Text, View } from 'react-native';
+import { CallbackOrObserver, FirebaseAuthTypes, getAuth, onAuthStateChanged } from '@react-native-firebase/auth';
 
-const Splash = ({ navigation }: RootScreenProps<Paths.Spalsh>) => {
-    useEffect(()=>{
-        setTimeout(()=>{
-            navigation.reset({
-            index: 0,
-            routes: [{ name: Paths.Login }],
-            });
-        },2000)
-    },[])
-    return (
-    <View style={{flex: 1, alignItems: 'center', justifyContent:'center'}}>
-        <Text style={{ fontSize: 60}}>NULL</Text>
+function Splash({ navigation }: RootScreenProps<Paths.Splash>) {
+  const handleAuthStateChanged = (user) => {
+
+    if (user) {
+      navigation.navigate(Paths.Profile);
+    }else{
+      navigation.navigate(Paths.Login)
+    }
+  }
+
+  useEffect(() => {
+    return onAuthStateChanged(getAuth(), handleAuthStateChanged); // unsubscribe on unmount
+  }, []);
+
+  // useEffect(() => {
+    // setTimeout(() => {
+  //     navigation.reset({
+  //       index: 0,
+  //       routes: [{ name: Paths.Login }],
+  //     });
+  //   }, 2000);
+  // });
+  return (
+    <View style={{ alignItems: 'center', flex: 1, justifyContent: 'center' }}>
+      <Text style={{ fontSize: 60 }}>NULL</Text>
     </View>
-    )
+  );
 }
 export default Splash;

@@ -3,19 +3,19 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import z from 'zod';
 
 const scheme = z.object({
-    username: z.string().trim(),
-    fullname: z.string().trim(),
-    age: z.date().optional(),
-    country: z.string().trim(),
+    age: z.date().nullable(),
     city: z.string().trim(),
-    email: z.string().email().trim(),
-    password: z.string().min(6).max(13),
-    confirmPassword: z.string().min(6).max(13),
-}).superRefine(({ confirmPassword, password }, ctx) => {
+    confirmPassword: z.string(),
+    country: z.string().trim(),
+    email: z.string().email("Неверная почта").trim(),
+    fullname: z.string().trim().max(24, "ФИО не должно содержать больше 24 букв"),
+    password: z.string().min(8, "Пароль должен содержать не меньше 8 символов"),
+    username: z.string().trim().min(4, "Логин не должно быть меньше 5 символов"),
+}).superRefine(({ confirmPassword, password }, context) => {
   if (confirmPassword !== password) {
-    ctx.addIssue({
+    context.addIssue({
       code: "custom",
-      message: "The passwords did not match",
+      message: "Пароли не совпадают",
       path: ['confirmPassword']
     });
   }

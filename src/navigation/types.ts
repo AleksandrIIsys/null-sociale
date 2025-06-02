@@ -8,7 +8,6 @@ export type RootScreenProps<
 export type RootStackParamList = {
   [Paths.Login]: undefined;
   [Paths.Register]: undefined;
-  [Paths.Spalsh]: undefined;
-  [Paths.Example]: undefined;
-  [Paths.Startup]: undefined;
+  [Paths.Splash]: undefined;
+  [Paths.Profile]: undefined;
 };

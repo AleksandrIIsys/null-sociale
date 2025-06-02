@@ -9,7 +9,6 @@ import {
 } from 'react';
 import type { Theme as NavigationTheme } from '@react-navigation/native';
 
-type Variant = 'dark' | 'light'
 export type Theme = {
   navigationTheme: NavigationTheme
   variant: Variant;
@@ -17,11 +16,12 @@ export type Theme = {
 type Context = {
   changeTheme: (variant: Variant) => void;
 } & Theme;
+type Variant = 'dark' | 'light'
 
 export const ThemeContext = createContext<Context | undefined>(undefined);
 
 
-const ThemeProvider = ({children}: PropsWithChildren) => {
+function ThemeProvider({children}: PropsWithChildren) {
 
   const [variant, setVariant] = useState<Variant>('light');
   const changeTheme = useCallback(

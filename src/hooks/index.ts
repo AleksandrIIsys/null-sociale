@@ -1,7 +1,7 @@
-import useStoreDispatch from './useStoreDispatch';
-import useStoreSelector from './useStoreSelector';
 
-export {
-  useStoreDispatch,
-  useStoreSelector
-};
+
+
+
+
+export {default as useStoreDispatch} from './useStoreDispatch';
+export {default as useStoreSelector} from './useStoreSelector';

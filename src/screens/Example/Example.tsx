@@ -10,38 +10,25 @@ function Example() {
     <SafeScreen>
       <ScrollView>
         <View
-          style={[
-            layout.justifyCenter,
-            layout.itemsCenter,
-            gutters.marginTop_80,
-     ]}
+          style={[]}
         >
           <View
           />
 
-          <View style={[]}>
-           
-          </View>
+          <View style={[]} />
         </View>
 
         <View style={[]}>
           <View style={[]}>
-            <Text style={[]}>
-            </Text>
+            <Text style={[ ]} />
             <Text
-              style={[]}
-            >
-            </Text>
+              style={[   ]}
+             />
           </View>
 
           <View
-            style={[
-              
-            ]}
-          >
-          
-
-          </View>
+            style={[  ]}
+           />
         </View>
       </ScrollView>
     </SafeScreen>

@@ -1,111 +1,264 @@
 import { Paths } from "@/navigation/paths";
 import { RootScreenProps } from "@/navigation/types";
-import { useState } from "react";
-import { TouchableOpacity, View } from "react-native";
-import { Text } from "react-native-gesture-handler";
+import { useState } from 'react';
+import {Text, TouchableOpacity, View} from "react-native";
 import { Button, TextInput } from "react-native-paper";
-import { SafeAreaView } from "react-native-safe-area-context";
 import DatePicker from 'react-native-date-picker'
-import { useRegisterForm } from "./validator";
+import {IRegisterForm, useRegisterForm} from "./validator";
+import { Controller } from 'react-hook-form';
+import {InputFormWrapper} from "@/components/molecules";
+import {
+    createUserWithEmailAndPassword,
+    getAuth,
+} from '@react-native-firebase/auth';
+import { doc, getFirestore, setDoc } from '@react-native-firebase/firestore';
+import {useStoreDispatch} from "@/hooks";
+import {setUser} from "@/store/reducers/user";
 
-
-const ACTIVE_FRAGMENT = {
-    firstFragment: 'first',
-    secondFragment: 'second' 
-}
 
 type ActiveFragmentType = 'first' | 'second'
 
-const FirstFragment = () => {}
-const SecondFragment = () => {}
-
-
-const Register = ({navigation}: RootScreenProps<Paths.Register>) => {
+function Register({navigation}: RootScreenProps<Paths.Register>) {
+    const [open, setOpen] = useState<boolean>(false);
+    const [error, setError] = useState<string | undefined>(undefined);
+    const dispatch = useStoreDispatch();
     const {
-        setError,
+        control,
+        formState: { dirtyFields, errors, isValid },
+        handleSubmit,
     } = useRegisterForm({
-        username: '',
-        fullname: '',
-        age: undefined,
-        country: '',
+        age: null,
         city: '',
+        confirmPassword: '',
+        country: '',
         email: '',
+        fullname: '',
         password: '',
-        confirmPassword: ''
+        username: ''
     })
     const [activeFragment, setActiveFragment] = useState<ActiveFragmentType>('first')
-    const [date, setDate] = useState<Date>()
-    const [open, setOpen] = useState(false)
-    const [pass1, setPass1] = useState<boolean>(true);
-    const [pass2, setPass2] = useState<boolean>(true);
     const handleBackButton = () => {
         switch(activeFragment){
-            case "second":
+            case "second": {
                 setActiveFragment('first')
+                setError('')
                 break;
-            default:
+            }
+            default: {
                 navigation.goBack();
+            }
         }
     }
     
     const handleContinueButton = ()=>{
-        setActiveFragment('second')
+        const { fullname, username } = dirtyFields;
+        const { fullname: fullnameError, username: usernameError } = errors;
+        if((fullname && !fullnameError) && (username && !usernameError)){
+            setActiveFragment('second')
+        }
     }
 
+  const onSubmit = ({ age, confirmPassword, email, password, ...other }:IRegisterForm) => {
+        confirmPassword.at(0);
+        createUserWithEmailAndPassword(getAuth(), email, password)
+          .then(async () => {
+              const { uid } = getAuth().currentUser ?? { uid: ''}
+              const user = {age: age?.toString() ?? '', ...other}
+              dispatch(setUser({user}))
+              const database = getFirestore();
+              try {
+                  await setDoc(doc(database, 'users', uid), {
+                  ...user
+                });
+              } catch (error) {
+                console.error('Error adding document:', error);
+              }
+            })
+          .catch((error: unknown) => {
+
+              if (error instanceof Error) {
+                  switch (error.code) {
+                      case 'auth/email-already-in-use': {
+                          setError('Почта уже используется');
+                          break;
+                      }
+                      case 'auth/invalid-email': {
+                          setError('Почта введена не правильно');
+                          break;
+                      }
+                      default: {
+                          setError('Ошибка сети')
+                      }
+                  }
+
+              }
+          });
+    }
     return (
-        <SafeAreaView style={{flex: 1, marginHorizontal: 24, position: 'relative'}}>
-            <View style={{position: 'relative', flexDirection:'row', justifyContent: 'center', marginBottom: 20}}>
-            <TouchableOpacity style={{marginTop: 12, position: 'absolute', left: 0}} onPress={handleBackButton}>
-                <Text style={{ fontSize: 16, fontWeight: 900}}>Назад</Text>
-            </TouchableOpacity>
-            <Text style={{fontSize: 24, alignSelf: 'center'}}>Регистрация</Text>
+      <View style={{ flex: 1, marginHorizontal: 24, position: 'relative' }}>
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'center',
+            marginVertical: 20,
+            position: 'relative',
+          }}>
+          <TouchableOpacity
+            onPress={handleBackButton}
+            style={{ left: 0, marginTop: 12, position: 'absolute' }}>
+            <Text style={{ fontSize: 16, fontWeight: 900 }}>Назад</Text>
+          </TouchableOpacity>
+          <Text style={{ alignSelf: 'center', fontSize: 24 }}>Регистрация</Text>
+        </View>
+        <View style={{ gap: 8 }}>
+          {activeFragment === 'first' && (
+            <View>
+              <Controller
+                control={control}
+                name="username"
+                render={({ field, fieldState: { error, isTouched } }) => (
+                  <InputFormWrapper
+                    error={error}
+                    isTouched={isTouched}
+                    label="Логин"
+                    mode="outlined"
+                    {...field}
+                  />
+                )}
+              />
+              <Controller
+                control={control}
+                name="fullname"
+                render={({ field, fieldState: { error, isTouched } }) => (
+                  <InputFormWrapper
+                    error={error}
+                    isTouched={isTouched}
+                    label="Имя Фамилия"
+                    mode="outlined"
+                    {...field}
+                  />
+                )}
+              />
             </View>
-            <View style={{gap: 8}}>
-                {activeFragment === 'first' && 
-                <>
-                    <TextInput label={"Логин"} mode={'outlined'}/>
-                    <TextInput label={"Имя Фамилия"} mode={'outlined'}/>
-                </>
-                }
-                {activeFragment === 'second' && 
-                <>
-                    <TouchableOpacity onPress={() => setOpen(true)}><TextInput label={"Дата рождения"} mode={'outlined'} editable={false} value={date?.toLocaleDateString('ru-RU') || ''} /></TouchableOpacity>
-                    <TextInput label={"Страна"} mode={'outlined'}/>
-                    <TextInput label={"Город"} mode={'outlined'}/>
-                    <TextInput label={"Email"} mode={'outlined'}/>
-                    <TextInput label={"Пароль"}  mode={'outlined'} autoCorrect={false} secureTextEntry={pass1} right={
-                        <TextInput.Icon
-                            icon="eye"
-                            onPress={() => setPass1(value => !value)}
-                        />
-                        }/>
-                    <TextInput label={"Подтверждение пароля"} mode={'outlined'} autoCorrect={false} secureTextEntry={pass2} right={
-                        <TextInput.Icon
-                            icon="eye"
-                            onPress={() => setPass2(value => !value)}
-                        />
-                        }/>
-                    </>}
-                </View>
-            <View style={{position: 'absolute', width: '100%', bottom: 24,}}>
-                <Button style={{borderRadius: 4, bottom: 24}} mode="contained-tonal" onPress={handleContinueButton} >
-                    Далее
-                </Button>
+          )}
+          {activeFragment === 'second' && (
+            <View>
+              <Controller
+                control={control}
+                name="age"
+                render={({ field: { onChange, value } }) => (
+                  <>
+                    <DatePicker
+                      date={value ?? new Date()}
+                      maximumDate={new Date()}
+                      modal
+                      mode="date"
+                      onCancel={() => {
+                        setOpen(false);
+                      }}
+                      onConfirm={date => {
+                        setOpen(false);
+                        onChange(date);
+                      }}
+                      open={open}
+                    />
+                    <TouchableOpacity
+                      onPress={() => {
+                        setOpen(true);
+                      }}>
+                      <TextInput
+                        editable={false}
+                        label="Дата рождения"
+                        mode="outlined"
+                        value={value?.toLocaleDateString('ru-RU') ?? ''}
+                      />
+                    </TouchableOpacity>
+                  </>
+                )}
+              />
+              <Controller
+                control={control}
+                name="country"
+                render={({ field, fieldState: { error, isTouched } }) => (
+                  <InputFormWrapper
+                    error={error}
+                    isTouched={isTouched}
+                    label="Страна"
+                    mode="outlined"
+                    {...field}
+                  />
+                )}
+              />
+              <Controller
+                control={control}
+                name="city"
+                render={({ field, fieldState: { error, isTouched } }) => (
+                  <InputFormWrapper
+                    error={error}
+                    isTouched={isTouched}
+                    label="Город"
+                    mode="outlined"
+                    {...field}
+                  />
+                )}
+              />
+              <Controller
+                control={control}
+                name="email"
+                render={({ field, fieldState: { error, isTouched } }) => (
+                  <InputFormWrapper
+                    error={error}
+                    isTouched={isTouched}
+                    label="Email"
+                    mode="outlined"
+                    {...field}
+                  />
+                )}
+              />
+              <Controller
+                control={control}
+                name="password"
+                render={({ field, fieldState: { error, isTouched } }) => (
+                  <InputFormWrapper
+                    error={error}
+                    isTouched={isTouched}
+                    label="Пароль"
+                    type="password"
+                    {...field}
+                  />
+                )}
+              />
+              <Controller
+                control={control}
+                name="confirmPassword"
+                render={({ field, fieldState: { error, isTouched } }) => (
+                  <InputFormWrapper
+                    error={error}
+                    isTouched={isTouched}
+                    label="Подтверждение пароля"
+                    type="password"
+                    {...field}
+                  />
+                )}
+              />
             </View>
-             <DatePicker
-                modal
-                open={open}
-                mode="date"
-                date={date || new Date()}
-                onConfirm={(date) => {
-                setOpen(false)
-                setDate(date)
-                }}
-                onCancel={() => {
-                setOpen(false)
-                }}
-            />
-        </SafeAreaView>
-    )
+          )}
+          {error ?? <Text style={{color: 'red', fontSize: 14}}>{error}</Text>}
+        </View>
+        <View style={{ bottom: 24, position: 'absolute', width: '100%' }}>
+          <Button
+            disabled={activeFragment === 'second' && !isValid}
+            mode="contained-tonal"
+            onPress={
+              activeFragment === 'second'
+                ? handleSubmit(onSubmit)
+                : handleContinueButton
+            }
+            style={{ borderRadius: 4, bottom: 24 }}>
+            Далее
+          </Button>
+        </View>
+      </View>
+    );
 }
 export default Register;
