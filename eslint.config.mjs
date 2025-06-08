@@ -78,7 +78,7 @@ export default tseslint.config(
       'no-console': [ERROR, { allow: ['warn', 'error'] }],
       'no-magic-numbers': [
         ERROR,
-        { ignore: [-1, 0, 1, 2, 3, 4, 5, 6], ignoreArrayIndexes: true },
+        { ignore: [-1, 0, 0.5, 1, 2, 3, 4, 5, 6], ignoreArrayIndexes: true },
       ],
       'perfectionist/sort-imports': [
         OFF, //TODO

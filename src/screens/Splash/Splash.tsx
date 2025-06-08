@@ -2,34 +2,27 @@ import { Paths } from '@/navigation/paths';
 import { RootScreenProps } from '@/navigation/types';
 import { useEffect } from 'react';
 import { Text, View } from 'react-native';
-import { CallbackOrObserver, FirebaseAuthTypes, getAuth, onAuthStateChanged } from '@react-native-firebase/auth';
+import { FirebaseAuthTypes, getAuth, onAuthStateChanged } from '@react-native-firebase/auth';
+import { StackActions } from '@react-navigation/native';
 
 function Splash({ navigation }: RootScreenProps<Paths.Splash>) {
-  const handleAuthStateChanged = (user) => {
-
+  const handleAuthStateChanged = (user: FirebaseAuthTypes.User | null) => {
     if (user) {
-      navigation.navigate(Paths.Profile);
-    }else{
-      navigation.navigate(Paths.Login)
+      navigation.dispatch(StackActions.replace(Paths.Main));
+    } else {
+      navigation.dispatch(StackActions.replace(Paths.Authentication));
     }
-  }
+  };
 
   useEffect(() => {
-    return onAuthStateChanged(getAuth(), handleAuthStateChanged); // unsubscribe on unmount
+    return onAuthStateChanged(getAuth(), handleAuthStateChanged);
   }, []);
 
-  // useEffect(() => {
-    // setTimeout(() => {
-  //     navigation.reset({
-  //       index: 0,
-  //       routes: [{ name: Paths.Login }],
-  //     });
-  //   }, 2000);
-  // });
   return (
     <View style={{ alignItems: 'center', flex: 1, justifyContent: 'center' }}>
-      <Text style={{ fontSize: 60 }}>NULL</Text>
+      <Text style={{ color: '#fff', fontSize: 60 }}>NULL</Text>
     </View>
   );
 }
+
 export default Splash;

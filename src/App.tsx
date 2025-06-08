@@ -12,12 +12,11 @@ import { PaperProvider } from 'react-native-paper';
 
 
 function App(): React.JSX.Element {
-
   return (
     <GestureHandlerRootView>
       <Provider store={store}>
           <PersistGate persistor={persistor}>
-            <PaperProvider theme={{dark: false}}>
+            <PaperProvider theme={{dark: true}}>
               <ThemeProvider>
                 <ApplicationNavigator />
               </ThemeProvider>

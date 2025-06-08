@@ -1,17 +1,29 @@
-import { Paths } from "@/navigation/paths";
-import { RootScreenProps } from "@/navigation/types";
-import { Text, View } from "react-native";
-import { Button } from "react-native-paper";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { Paths } from '@/navigation/paths';
+import { AuthScreenProps } from '@/navigation/types';
+import { Text, TouchableOpacity, View } from 'react-native';
+import { Button } from 'react-native-paper';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { ILoginForm, useLoginForm } from '@/screens/Login/validator.ts';
 import { InputFormWrapper } from '@/components/molecules';
 import { Controller } from 'react-hook-form';
-import { getAuth, signInWithEmailAndPassword } from '@react-native-firebase/auth';
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+} from '@react-native-firebase/auth';
 import { LoadingFullScreen } from '@/components/templates';
 import { useState } from 'react';
+import { StackActions } from '@react-navigation/native';
+import { styles } from '@/screens/Login/styles.ts';
 
-function Login({ navigation }: RootScreenProps<Paths.Login>) {
+class FirebaseError {
+  code: string;
 
+  constructor(code: string) {
+    this.code = code;
+  }
+}
+
+function Login({ navigation }: AuthScreenProps<Paths.Login>) {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | undefined>(undefined);
   const {
@@ -22,82 +34,89 @@ function Login({ navigation }: RootScreenProps<Paths.Login>) {
     email: '',
     password: '',
   });
-    const handleRegistrationButton =  () => {
-        navigation.navigate(Paths.Register)
-    }
-    const onSubmit = ({email, password}:ILoginForm) => {
-      setLoading(true);
-      signInWithEmailAndPassword(getAuth(), email, password).then(() => {
+  const handleRegistrationButton = () => {
+    navigation.navigate(Paths.Register);
+  };
+  const onSubmit = ({ email, password }: ILoginForm) => {
+    setLoading(true);
+    signInWithEmailAndPassword(getAuth(), email, password)
+      .then(() => {
         setLoading(false);
-      }).catch((error: unknown) => {
+        navigation.dispatch(StackActions.replace(Paths.Main));
+      })
+      .catch((error: unknown) => {
         setLoading(false);
-        switch (error.code) {
-          case 'auth/invalid-credential': {
-            setError('Неверные данные');
-            break;
-          }
-          default: {
-            setError('Ошибка сети')
+        if (error instanceof FirebaseError) {
+          switch (error.code) {
+            case 'auth/invalid-credential': {
+              setError('Неверные данные');
+              break;
+            }
+            default: {
+              setError('Ошибка сети');
+            }
           }
         }
-      })
-    }
-    return (
-      <SafeAreaView
-        style={{ flex: 1, justifyContent: 'center', marginHorizontal: 32 }}>
-        <View style={{ gap: 8 }}>
-          <Text style={{ fontSize: 32, marginBottom: 20, textAlign: 'center' }}>
-            Авторизация
-          </Text>
-          <Controller
-            control={control}
-            name="email"
-            render={({ field, fieldState: { error, isTouched } }) => (
-              <InputFormWrapper
-                error={error}
-                isTouched={isTouched}
-                label="Почта"
-                mode="outlined"
-                {...field}
-              />
-            )}
-          />
-          <Controller
-            control={control}
-            name="password"
-            render={({ field, fieldState: { error, isTouched } }) => (
-              <InputFormWrapper
-                error={error}
-                isTouched={isTouched}
-                label="Пароль"
-                mode="outlined"
-                {...field}
-              />
-            )}
-          />
+      });
+  };
+  return (
+    <SafeAreaView style={styles.container}>
+      <View style={{ gap: 8 }}>
+        <Text style={styles.titleText}>Авторизация</Text>
+        <Controller
+          control={control}
+          name="email"
+          render={({ field, fieldState: { error, isTouched } }) => (
+            <InputFormWrapper
+              error={error}
+              isTouched={isTouched}
+              label="Почта"
+              {...field}
+            />
+          )}
+        />
+        <Controller
+          control={control}
+          name="password"
+          render={({ field, fieldState: { error, isTouched } }) => (
+            <InputFormWrapper
+              error={error}
+              isTouched={isTouched}
+              label="Пароль"
+              {...field}
+            />
+          )}
+        />
 
-          <Text style={{ color: 'red', fontSize: 14 }}>{error ?? ''}</Text>
-          <Button
-            disabled={!isValid}
-            mode="contained-tonal"
-            onPress={handleSubmit(onSubmit)}
-            style={{ borderRadius: 4, marginTop: 20 }}>
-            Войти
-          </Button>
-        </View>
-        <Text style={{ fontSize: 16, marginVertical: 12, textAlign: 'center' }}>
-          или
+        <Text style={{ color: 'red', fontSize: 14 }}>{error ?? ''}</Text>
+        <Button
+          contentStyle={{
+            backgroundColor: '#fff',
+          }}
+          disabled={!isValid}
+          labelStyle={{ fontWeight: 900 }}
+          mode="contained-tonal"
+          onPress={handleSubmit(onSubmit)}
+          style={styles.button}
+          textColor="#000">
+          Войти
+        </Button>
+      </View>
+      <TouchableOpacity
+        onPress={handleRegistrationButton}
+        style={{
+          bottom: 0,
+          marginBottom: 24,
+          position: 'absolute',
+          width: '100%',
+        }}>
+        <Text style={[styles.baseText, styles.bottomText]}>
+          У вас ещё нет учетной записи?
         </Text>
-        <View>
-          <Button
-            mode="contained-tonal"
-            onPress={handleRegistrationButton}
-            style={{ borderRadius: 4 }}>
-            Регистрация
-          </Button>
-        </View>
-        <LoadingFullScreen loading={loading} />
-      </SafeAreaView>
-    );
+      </TouchableOpacity>
+      <LoadingFullScreen loading={loading} />
+    </SafeAreaView>
+  );
 }
+
 export default Login;

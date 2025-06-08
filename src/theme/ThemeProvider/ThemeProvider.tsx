@@ -23,7 +23,7 @@ export const ThemeContext = createContext<Context | undefined>(undefined);
 
 function ThemeProvider({children}: PropsWithChildren) {
 
-  const [variant, setVariant] = useState<Variant>('light');
+  const [variant, setVariant] = useState<Variant>('dark');
   const changeTheme = useCallback(
     (nextVariant: Variant) => {
       setVariant(nextVariant);

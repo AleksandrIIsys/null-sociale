@@ -1,11 +1,11 @@
-import { PasswordInput } from '@/components/atoms';
-import { TextInput, TextInputProps } from 'react-native-paper';
+import { BaseInput, PasswordInput } from '@/components/atoms';
+import { TextInputProps } from 'react-native-paper';
 import { useMemo } from 'react';
 import {Text, View} from "react-native";
 import { FieldError} from "react-hook-form";
 
 const InputTypes = {
-  default: TextInput,
+  default: BaseInput,
   password: PasswordInput,
 }
 const TYPE = 'default'
